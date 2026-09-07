@@ -90,8 +90,8 @@ selected implementer's work in the primary session.
 For `audit` and `full`, after parent verification, spawn a new native Astra / High
 reviewer using the stable `sol_advisor_sol_reviewer` role. The reviewer must remain
 behaviorally read-only, inspect the actual accumulated diff, and return exactly ship,
-fix-first, or rethink. A reviewer never implements its own fixes. `solo` and `delegate`
-do not receive a fresh reviewer.
+fix-first, or rethink. A reviewer never implements its own fixes.
+`solo` and `delegate` do not receive a fresh reviewer.
 
 - ship: report completion with the verification evidence.
 - fix-first applies only to `audit` and `full`:
