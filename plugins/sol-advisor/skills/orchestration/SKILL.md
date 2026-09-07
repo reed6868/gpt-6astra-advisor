@@ -17,10 +17,10 @@ preflight, runtime-evidence, isolation, and maintainer procedures.
 
 ## Confirm the primary session
 
-Run the primary Codex session on gpt-5.6-sol with high reasoning. Verify the current
+Run the primary Codex session on gpt-6-astra with high reasoning. Verify the current
 model and effort when runtime metadata exposes them. If either differs, tell the user
-to select Sol / High and stop before delegation. If runtime metadata does not expose
-them, ask the user to confirm Sol / High and stop until confirmed. A skill cannot
+to select Astra / High and stop before delegation. If runtime metadata does not expose
+them, ask the user to confirm Astra / High and stop until confirmed. A skill cannot
 change the primary model itself; never assume or claim this prerequisite is satisfied.
 
 ## Declare the route before task tools
@@ -40,9 +40,9 @@ escalation. Details and the task-scoped preflight matrix are in operations.md.
 
 ## Preflight selected auxiliaries only
 
-Confirm Sol / High in the primary session. Preflight only an auxiliary selected by the
-declared route: none for solo; Luna / Max or Terra / High for delegate; fresh Sol / High
-for audit; and the selected implementer plus fresh Sol reviewer for full. Public metadata
+Confirm Astra / High in the primary session. Preflight only an auxiliary selected by the
+declared route: none for solo; Luna / Max or Terra / High for delegate; fresh Astra / High
+for audit; and the selected implementer plus fresh Astra reviewer for full. Public metadata
 for role, model, and effort is authoritative. If it omits a model or effort, use the
 local inspector only for that omitted field. Missing, conflicting, unavailable, or
 unobservable evidence stops the affected lane; never silently substitute a role,
@@ -54,10 +54,10 @@ model, effort, or reviewer.
 - `delegate`: select Luna / Max for bounded, fully specified work, or Terra / High for
   judgment-heavy, high-risk, context-heavy, or wide-blast-radius work. The selected
   implementer executes the complete spec; root verifies; do not request a fresh review.
-- `audit`: root implements and verifies; a fresh read-only Sol / High reviewer reviews
+- `audit`: root implements and verifies; a fresh read-only Astra / High reviewer reviews
   the accumulated diff; spawn no implementer.
 - `full`: only for an explicit broad or high-risk exception. Select one implementer,
-  root verifies, then a fresh read-only Sol / High reviewer reviews.
+  root verifies, then a fresh read-only Astra / High reviewer reviews.
 
 Auxiliary work must substitute for root work, not duplicate it. A Luna result may
 justify escalation to Terra / High only when it reveals newly observed complexity,
@@ -87,10 +87,11 @@ selected implementer's work in the primary session.
 
 ## Review only when the route includes it
 
-For `audit` and `full`, after parent verification, spawn a new native Sol / High
-reviewer. The reviewer must remain behaviorally read-only, inspect the actual
-accumulated diff, and return exactly ship, fix-first, or rethink. A reviewer never
-implements its own fixes. `solo` and `delegate` do not receive a fresh reviewer.
+For `audit` and `full`, after parent verification, spawn a new native Astra / High
+reviewer using the stable `sol_advisor_sol_reviewer` role. The reviewer must remain
+behaviorally read-only, inspect the actual accumulated diff, and return exactly ship,
+fix-first, or rethink. A reviewer never implements its own fixes. `solo` and `delegate`
+do not receive a fresh reviewer.
 
 - ship: report completion with the verification evidence.
 - fix-first applies only to `audit` and `full`:
