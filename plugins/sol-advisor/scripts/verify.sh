@@ -43,6 +43,7 @@ legacy_luna_sha256=fba1b42849d93737e83b094a2ab0b1611f87ac37db7438c8bbdf581f0813f
 legacy_terra_sha256=4425a8c1f21ce8c6af93f96adc253bbc33ea301f1389b3fa8ce350be08584eca
 legacy_luna_v050_sha256=5cfaf77f14757074ca5d3cfecd0b8204c91dc14eff8d6119985c64416ddf4853
 legacy_terra_v050_sha256=dc329fe87f6f6610c13157ec16432f91c79cf5a541ee3e7448f6afb165dd18ce
+legacy_sol_v060_sha256=0333acf0ef562bcfebd06009ac09bd1dd8cbc04c4cf28e08e9e049bd8bf202d2
 
 snapshot_files() {
   target=$1
@@ -97,8 +98,8 @@ the owned file set, and document material judgment calls.
 You are not alone in the codebase: preserve concurrent edits and do not revert
 unrelated work. Surface ambiguity, scope conflicts, or verification failures rather
 than changing the architecture without direction. Run the requested checks and report
-actual evidence. Do not silently substitute a different role, model, or reasoning
-level; this installed custom-agent profile is the required complex lane.
+actual evidence. Do not silently substitute a different role, model, or
+reasoning level; this installed custom-agent profile is the required complex lane.
 """
 LEGACY_TERRA
   cp "$templates/$sol_file" "$target/$sol_file"
@@ -156,6 +157,15 @@ V050_TERRA
   [ "$(shasum -a 256 "$target/$terra_file" | awk '{print $1}')" = "$legacy_terra_v050_sha256" ] || fail "v0.5.0 Terra fixture digest drifted"
 }
 
+write_v060_roles() {
+  target=$1
+  mkdir -p "$target"
+  cp "$templates/$luna_file" "$target/$luna_file"
+  cp "$templates/$terra_file" "$target/$terra_file"
+  sed 's/model = "gpt-6-astra"/model = "gpt-5.6-sol"/' "$templates/$sol_file" > "$target/$sol_file"
+  [ "$(shasum -a 256 "$target/$sol_file" | awk '{print $1}')" = "$legacy_sol_v060_sha256" ] || fail "v0.6.0 Sol reviewer fixture digest drifted"
+}
+
 for required in "$installer" "$runtime_inspector" "$manifest" "$skill" "$contracts" "$operations" "$readme" "$ui"; do
   test -f "$required" || fail "required file missing: $required"
 done
@@ -167,7 +177,7 @@ jq empty "$manifest"
 grep -Fq 'SELECTIVE ROUTE' "$manifest" || fail "manifest omits route declaration"
 grep -Fq 'solo is the default' "$manifest" || fail "manifest omits solo default"
 grep -Fq 'delegate uses native GPT-5.6 Luna / Max' "$manifest" || fail "manifest omits delegate role contract"
-grep -Fq 'audit uses a fresh read-only GPT-5.6 Sol / High review' "$manifest" || fail "manifest omits audit contract"
+grep -Fq 'audit uses a fresh read-only GPT-6 Astra / High review' "$manifest" || fail "manifest omits audit contract"
 grep -Fq 'full combines one selected implementer' "$manifest" || fail "manifest omits exceptional full contract"
 grep -Fq 'fails closed' "$manifest" || fail "manifest omits fail-closed evidence rule"
 pass "manifest JSON, v0.6.0 release, and selective-routing language"
@@ -191,7 +201,7 @@ expected = {
     },
     "sol-advisor-sol-reviewer.toml": {
         "name": "sol_advisor_sol_reviewer",
-        "model": "gpt-5.6-sol",
+        "model": "gpt-6-astra",
         "model_reasoning_effort": "high",
         "sandbox_mode": "read-only",
     },
@@ -215,6 +225,7 @@ grep -Fq "legacy_luna_sha256=$legacy_luna_sha256" "$installer" || fail "installe
 grep -Fq "legacy_terra_sha256=$legacy_terra_sha256" "$installer" || fail "installer legacy Terra digest mismatch"
 grep -Fq "legacy_luna_v050_sha256=$legacy_luna_v050_sha256" "$installer" || fail "installer v0.5.0 Luna digest mismatch"
 grep -Fq "legacy_terra_v050_sha256=$legacy_terra_v050_sha256" "$installer" || fail "installer v0.5.0 Terra digest mismatch"
+grep -Fq "legacy_sol_v060_sha256=$legacy_sol_v060_sha256" "$installer" || fail "installer v0.6.0 Sol reviewer digest mismatch"
 pass "immutable historical migration fingerprints"
 
 clean_target=$tmp_dir/clean
@@ -307,6 +318,24 @@ for role in "$luna_file" "$terra_file" "$sol_file"; do
 done
 sh "$installer" --target-dir "$v050_migration_target" --check
 pass "exact v0.5.0 Luna/Terra migration"
+
+v060_migration_target=$tmp_dir/v060-migration
+write_v060_roles "$v060_migration_target"
+sh "$installer" --target-dir "$v060_migration_target"
+for role in "$luna_file" "$terra_file" "$sol_file"; do
+  cmp -s "$templates/$role" "$v060_migration_target/$role" || fail "v0.6.0 reviewer migration mismatch: $role"
+done
+sh "$installer" --target-dir "$v060_migration_target" --check
+pass "exact v0.6.0 Sol reviewer migration to GPT-6 Astra"
+
+modified_v060_sol=$tmp_dir/modified-v060-sol
+write_v060_roles "$modified_v060_sol"
+printf 'X' >> "$modified_v060_sol/$sol_file"
+before=$(snapshot_files "$modified_v060_sol")
+if sh "$installer" --target-dir "$modified_v060_sol"; then fail "installer replaced modified v0.6.0 Sol reviewer"; fi
+after=$(snapshot_files "$modified_v060_sol")
+[ "$before" = "$after" ] || fail "modified v0.6.0 Sol reviewer refusal partially mutated target"
+pass "modified v0.6.0 Sol reviewer refusal with zero partial mutation"
 
 modified_v050_luna=$tmp_dir/modified-v050-luna
 write_v050_roles "$modified_v050_luna"
@@ -405,6 +434,7 @@ grep -Fq 'Solo is the default' "$skill" || fail "skill omits solo default"
 grep -Fq 'One auxiliary agent is the default maximum' "$skill" || fail "skill omits auxiliary limit"
 grep -Fq 'A later declaration may only escalate the route when newly' "$skill" || fail "skill omits escalation gate"
 grep -Fq 'never silently downgrade' "$skill" || fail "skill permits silent downgrade"
+grep -Fq 'gpt-6-astra with high reasoning' "$skill" || fail "skill omits GPT-6 Astra primary pin"
 grep -Fqi 'public metadata' "$skill" || fail "skill lacks public-metadata evidence rule"
 grep -Fqi 'local inspector' "$skill" || fail "skill lacks runtime fallback rule"
 grep -Fqi 'parent captures and verifies exact before-and-after' "$contracts" || fail "contracts lack behavioral read-only state check"
@@ -417,7 +447,7 @@ grep -Fqi 'auxiliary work substitutes for root work' "$contracts" || fail "contr
 grep -Fqi 'first Luna result' "$contracts" || fail "contracts omit Luna-to-Terra escalation"
 grep -Fqi 'not a prerequisite' "$contracts" || fail "contracts make corrected Luna mandatory"
 grep -Fq 'do not request a fresh review' "$skill" || fail "skill makes delegate review mandatory"
-grep -Fq '`solo` and `delegate` do not receive a fresh reviewer' "$skill" || fail "skill makes solo/delegate review mandatory"
+grep -Fq '`solo` and `delegate`' "$skill" || fail "skill makes solo/delegate review mandatory"
 grep -Fq 'audit: the root implements the required correction, re-verifies, and obtains a new' "$skill" || fail "skill does not assign audit corrections to root"
 grep -Fq 'full: the selected implementer handles the required correction, the root' "$skill" || fail "skill does not assign full corrections to selected implementer"
 if grep -Fq 'fix-first: delegate the required correction' "$skill"; then fail "skill retains unconditional fix-first delegation"; fi
@@ -524,7 +554,8 @@ for path in paths:
 print("obsolete workflow references are absent")
 PY
 
-grep -Fq 'Sol / High runs the show' "$readme" || fail "README omits primary ownership"
+grep -Fq 'Astra / High runs the show' "$readme" || fail "README omits primary ownership"
+grep -Fq 'GPT-6' "$readme" || fail "README omits GPT-6 Astra primary requirement"
 grep -Fq 'Luna / Max' "$readme" || fail "README omits Luna / Max delegate path"
 grep -Fq 'Terra / High' "$readme" || fail "README omits Terra delegate path"
 grep -Fq 'Auxiliary work substitutes' "$readme" || fail "README omits substitution rule"
@@ -532,6 +563,11 @@ grep -Fq 'Attention Heads' "$readme" || fail "README lost Attention Heads sectio
 grep -Fq 'https://attentionheads.substack.com/?utm_source=github&utm_medium=readme&utm_campaign=sol-advisor' "$readme" || fail "README changed Attention Heads link"
 grep -Fq 'https://attentionheads.substack.com/subscribe?utm_source=github&utm_medium=readme&utm_campaign=sol-advisor' "$readme" || fail "README changed Subscribe link"
 pass "README selective routing and preserved Go deeper links"
+
+for document in "$readme" "$manifest" "$skill" "$contracts" "$operations" "$templates"; do
+  if grep -Fqi 'gpt-5.6-sol' "$document"; then fail "active contract retains gpt-5.6-sol in $document"; fi
+done
+pass "active primary/reviewer contracts no longer pin GPT-5.6 Sol"
 
 for document in "$readme" "$manifest" "$skill" "$contracts" "$ui"; do
   if grep -Eqi 'Terra / High is the sole implementation producer|one role-pinned .*handles all implementation|route all implementation through.*Terra|delegate all implementation to (the )?(native )?Terra' "$document"; then
