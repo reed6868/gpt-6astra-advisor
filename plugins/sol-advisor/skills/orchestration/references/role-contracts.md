@@ -21,9 +21,9 @@ Solo is the default; one auxiliary is the default maximum. Full is an explicit b
 or high-risk exception. A later route declaration may only escalate after newly
 observed risk justifies it and supplies that evidence; never silently downgrade.
 
-Confirm Sol / High in the primary session, then preflight only auxiliaries selected by
-the route: none for solo; Luna / Max or Terra / High for delegate; fresh Sol / High
-for audit; and one selected implementer plus fresh Sol reviewer for full. Cache each
+Confirm Astra / High in the primary session, then preflight only auxiliaries selected by
+the route: none for solo; Luna / Max or Terra / High for delegate; fresh Astra / High
+for audit; and one selected implementer plus fresh Astra reviewer for full. Cache each
 successful check only for the task. After spawning, complete the selected role's
 routing and reviewer-isolation checks before accepting the result:
 
@@ -31,7 +31,7 @@ routing and reviewer-isolation checks before accepting the result:
 2. Observe the selected role, model, and effort through public spawn/details metadata
    first, using the local runtime inspector only for omitted fields. Accept Luna /
    Max for bounded delegate/full implementation, Terra / High for higher-risk
-   delegate/full implementation, and Sol / High for audit/full review.
+   delegate/full implementation, and Astra / High for audit/full review.
 3. For the reviewer, capture actual sandbox policy and permission profile types.
 
 A missing, stale, unsafe, conflicting, unavailable, inconsistent, or unobservable
@@ -85,12 +85,12 @@ The primary session must inspect the diff and rerun verification itself.
 - `solo`: root plans, implements, tests, and self-reviews. Spawn no auxiliary.
 - `delegate`: one selected Luna / Max or Terra / High implementer executes the complete
   five-part specification. The root verifies. Do not spawn a fresh reviewer.
-- `audit`: root implements and verifies. A fresh read-only Sol / High reviewer inspects
+- `audit`: root implements and verifies. A fresh read-only Astra / High reviewer inspects
   the accumulated diff. Spawn no implementer. On `fix-first`, the root implements the
   correction, re-verifies, and obtains a new fresh reviewer.
 - `full`: use only for an explicit broad or high-risk exception. One selected Luna /
   Max or Terra / High implementer executes the complete specification, the root
-  verifies, and a fresh read-only Sol / High reviewer inspects the accumulated diff.
+  verifies, and a fresh read-only Astra / High reviewer inspects the accumulated diff.
   On `fix-first`, the selected implementer handles the correction, the root
   re-verifies, and a new fresh reviewer inspects the result.
 
@@ -153,7 +153,7 @@ constraint, and surface ambiguity instead of redesigning the architecture.
 <paste and complete the Shared implementation contract>
 ~~~
 
-## Fresh Sol / High - requested-read-only audit/full reviewer
+## Fresh Astra / High - requested-read-only audit/full reviewer
 
 Only for an audit or full route, after parent verification, spawn a new native thread
 exactly:
@@ -163,7 +163,7 @@ agent_type: sol_advisor_sol_reviewer
 fork_turns: none
 ~~~
 
-The installed role pins Sol / High and requests a read-only sandbox. Do not attach
+The installed role pins GPT-6 Astra / High and requests a read-only sandbox. Do not attach
 per-spawn model or reasoning fields. Observe the actual role, pin, sandbox policy, and
 permission profile before accepting its verdict.
 
@@ -191,7 +191,7 @@ REVIEW
 Inspect the actual files and accumulated change set. Judge correctness, completeness,
 regressions, scope discipline, interface preservation, test adequacy, and material risk.
 
-SOL REVIEW
+ASTRA REVIEW
 VERDICT: ship | fix-first | rethink
 REASON: <decisive evidence-based reason>
 FINDINGS: <precise file references and required fixes, or none>
@@ -199,7 +199,7 @@ RESIDUAL RISK: <most important remaining risk, or none>
 ~~~
 
 If any fix is made after review, discard the verdict and run a new fresh review.
-Sol reviewing Sol is context-clean, not cross-model-family independence.
+Astra reviewing Astra is context-clean, not cross-model-family independence.
 
 Use observed isolation, not requested isolation:
 

@@ -12,7 +12,7 @@ The installed TOMLs are the source of truth:
 |---|---|---|---|
 | sol_advisor_luna_implementer | gpt-5.6-luna | max | Delegate/full bounded routine implementation |
 | sol_advisor_terra_implementer | gpt-5.6-terra | high | Delegate/full judgment-heavy or high-risk implementation |
-| sol_advisor_sol_reviewer | gpt-5.6-sol | high | Audit/full fresh review; requests read-only sandbox |
+| sol_advisor_sol_reviewer | gpt-6-astra | high | Audit/full fresh review; requests read-only sandbox |
 
 Native spawn requests name the role and use a fresh context:
 
@@ -28,7 +28,8 @@ agent_type: sol_advisor_terra_implementer
 fork_turns: none
 ~~~
 
-Use a fresh Sol reviewer only for audit or full after parent verification:
+Use a fresh Astra reviewer only for audit or full after parent verification. The stable
+role ID remains `sol_advisor_sol_reviewer` for compatibility:
 
 ~~~text
 agent_type: sol_advisor_sol_reviewer
@@ -40,7 +41,7 @@ unobservable role/model/effort is a hard stop; never substitute another role.
 
 ## Selective route declaration, preflight, and caching
 
-The primary session must be Sol / High. Companion installation is separate from task
+The primary session must be Astra / High. Companion installation is separate from task
 routing because plugin installation does not register user-owned TOMLs.
 
 At installation or update time, run the repository-relative installer and its exactness
@@ -61,9 +62,10 @@ sh "$installer" --check
 ~~~
 
 The installer is fail-closed and performs its own post-install exactness check. It
-recognizes only byte-exact historical templates, including the shipped v0.2.0 profiles
-and the v0.5.0 Luna/Terra profiles during a v0.5.1 update. Modified/unsafe/nonregular/
-symlinked/conflicting destinations remain refusals, and all mutations are preflighted.
+recognizes only byte-exact historical templates, including the shipped v0.2.0 profiles,
+the v0.5.0 Luna/Terra profiles, and the v0.6.0 Sol reviewer when migrating its model pin
+to GPT-6 Astra. Modified/unsafe/nonregular/symlinked/conflicting destinations remain
+refusals, and all mutations are preflighted.
 
 The root emits one machine-auditable declaration before its first task tool call:
 
@@ -137,7 +139,7 @@ prompts, messages, environment variables, tokens, configuration, or arbitrary ro
 payloads.
 
 Accepted routing is Luna / max for bounded delegate/full implementation, Terra / high
-for higher-risk delegate/full implementation, and Sol / high for audit/full review.
+for higher-risk delegate/full implementation, and Astra / high for audit/full review.
 If public and local evidence both exist, they must agree. The local inspector is not a
 model-selection fallback.
 
@@ -173,9 +175,9 @@ acceptance. Worker claims never replace direct inspection.
 In solo, the root plans, implements, tests, and self-reviews with no auxiliary. In
 delegate, one selected Luna or Terra implementer completes the spec and the root
 verifies with no fresh reviewer. In audit, the root implements and verifies, then a
-fresh Sol reviewer reviews. In full, one selected implementer completes the spec, the
-root verifies, and a fresh Sol reviewer reviews. Auxiliary work substitutes for root
-work; it does not duplicate it. A reviewer never fixes its own findings.
+fresh Astra reviewer reviews. In full, one selected implementer completes the spec,
+the root verifies, and a fresh Astra reviewer reviews. Auxiliary work substitutes for
+root work; it does not duplicate it. A reviewer never fixes its own findings.
 
 ## Maintainer verification
 
